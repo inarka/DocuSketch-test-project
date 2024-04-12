@@ -63,6 +63,7 @@ class Plotter:
         plt.rcParams['figure.figsize'] = (10, 6)
 
     def __save_plot_to_file(self, filename):
+        filename = filename.replace(' ', '_')
         filepath = f'{os.path.join(self.plot_dir, filename)}.png'
         plt.savefig(filepath, dpi=300)
         return filepath
