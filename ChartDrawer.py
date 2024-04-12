@@ -34,15 +34,22 @@ class Plotter:
             print(f'An error occurred: {e}')
             return []
 
+        floor_columns = ['floor_min', 'floor_mean', 'floor_max']
+        ceiling_columns = ['ceiling_min', 'ceiling_mean', 'ceiling_max']
+
         plot_paths = []
         try:
             plot_paths.append(self.draw_scatterplot(df, 'gt_corners', 'rb_corners', True))
+            plot_paths.append(self.draw_scatterplot(df, 'gt_corners', 'mean'))
             plot_paths.append(self.draw_scatterplot(df, 'floor_mean', 'ceiling_mean'))
             plot_paths.append(self.draw_histogram(df, 'mean'))
             plot_paths.append(self.draw_histogram(df, 'floor_mean'))
             plot_paths.append(self.draw_histogram(df, 'ceiling_mean'))
-            plot_paths.append(self.draw_boxplots(df, ['mean', 'floor_mean', 'ceiling_mean'], 'means'))
             plot_paths.append(self.draw_boxplots(df, ['min', 'mean', 'max'], 'stats'))
+            plot_paths.append(self.draw_boxplots(df, ['mean', 'floor_mean', 'ceiling_mean'], 'means'))
+            plot_paths.append(self.draw_boxplots(df, floor_columns, 'floor stats'))
+            plot_paths.append(self.draw_boxplots(df, ceiling_columns, 'ceiling stats'))
+            plot_paths.append(self.draw_combined_boxplots(df, floor_columns, ceiling_columns, 'Floor vs Ceiling'))
             plot_paths.append(self.draw_top_bottom_data(df, 'mean', 10))
             plot_paths.append(self.draw_top_bottom_data(df, 'mean', 10, False))
         except KeyError as e:
@@ -94,6 +101,23 @@ class Plotter:
     def draw_boxplots(self, data, columns, title):
         plt.figure()
         sns.boxplot(x='variable', y='value', data=pd.melt(data[columns]))
+        title = f'Boxplots for {title}'
+        self.__plot_setup(title, '', 'Degrees')
+        path = self.__save_plot_to_file(title)
+        self.__show_and_close_plot()
+        return path
+
+    def draw_combined_boxplots(self, data, columns_1, columns_2, title):
+        plt.figure()
+        floor_data = pd.melt(data[columns_1], var_name='Metric', value_name='Value')
+        floor_data['Type'] = 'Floor'
+        ceiling_data = pd.melt(data[columns_2], var_name='Metric', value_name='Value')
+        ceiling_data['Type'] = 'Ceiling'
+
+        combined_data = pd.concat([floor_data, ceiling_data])
+        combined_data['Metric'] = combined_data['Metric'].str.replace('floor_', '').str.replace('ceiling_', '')
+
+        sns.boxplot(x='Metric', y='Value', hue='Type', data=combined_data)
         title = f'Boxplots for {title}'
         self.__plot_setup(title, '', 'Degrees')
         path = self.__save_plot_to_file(title)
