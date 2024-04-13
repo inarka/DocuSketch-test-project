@@ -131,7 +131,7 @@ class Plotter:
         ceiling_data['type'] = 'Ceiling'
 
         combined_data = pd.concat([floor_data, ceiling_data])
-        combined_data['Metric'] = combined_data['Metric'].str.replace('floor_', '').str.replace('ceiling_', '')
+        combined_data['metric'] = combined_data['metric'].str.replace('floor_', '').str.replace('ceiling_', '')
 
         sns.boxplot(x='metric', y='value', hue='type', data=combined_data)
         title = f'Boxplots for {title}'
@@ -144,6 +144,8 @@ class Plotter:
         plt.figure()
         values = data.sort_values(by=column, ascending=top).head(cnt)
         sns.barplot(x=column, y='name', data=values)
+        plt.yticks(rotation=45)
+        plt.tight_layout()
         order = 'best' if top else 'worst'
         title = f'Top {cnt} {order} results for {column}'
         self.__plot_setup(title, 'Degrees', '')
