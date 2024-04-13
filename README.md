@@ -29,11 +29,11 @@ This project is designed to visualize the deviations of floor vs ceiling corners
    
 2. Create and active a virtual environment:
 ```bash
-python -m venv venv
+py -m venv venv
 ```
 - On Windows:
 ```bash
-.\venv\Scripts\activate
+ source ./venv/Scripts/activate
 ```
 - On macOS and Linux:
 ```bash
