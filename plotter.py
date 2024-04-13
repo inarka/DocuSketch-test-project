@@ -2,12 +2,10 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import os
-import requests
-
 
 class Plotter:
     """
-    A class used to generate various statistical plots from data provided as JSON via a URL.
+    A class used to generate various statistical plots from data provided as JSON.
 
     Attributes:
     plot_dir (str): Directory where plots will be saved.
@@ -17,36 +15,28 @@ class Plotter:
         os.makedirs(self.plot_dir, exist_ok=True)
         self.__set_plot_params()
 
-    def __check_url(self, url):
-        try:
-            response = requests.head(url, timeout=5)
-            response.raise_for_status()
-            return True
-        except requests.RequestException as e:
-            print(f"Failed to connect to URL: {e}")
-            return False
-
     def draw_plots(self, file_path):
         """
-        Draws a variety of plots from JSON data retrieved from a specified URL.
+        Draws a variety of plots from JSON data retrieved from file.
 
         Args:
-        file_path (str): The URL pointing to the JSON file to be plotted.
+        file_path (str): The path to the JSON file to be plotted.
 
         Returns:
         list: A list of file paths to the created plots.
         """
-        if not self.__check_url(file_path):
-            print("URL is not accessible")
+
+        if not os.path.exists(file_path):
+            print(f"File not found: {file_path}")
             return []
 
         try:
             df = pd.read_json(file_path)
         except ValueError as e:
-            print(f'Failed to read JSON: {e}')
+            print(f"Failed to read JSON (Invalid JSON): {e}")
             return []
         except Exception as e:
-            print(f'An error occurred: {e}')
+            print(f"An error occurred: {e}")
             return []
 
         floor_columns = ['floor_min', 'floor_mean', 'floor_max']
