@@ -6,6 +6,12 @@ import requests
 
 
 class Plotter:
+    """
+    A class used to generate various statistical plots from data provided as JSON via a URL.
+
+    Attributes:
+    plot_dir (str): Directory where plots will be saved.
+    """
     def __init__(self):
         self.plot_dir = 'plots'
         os.makedirs(self.plot_dir, exist_ok=True)
@@ -21,6 +27,15 @@ class Plotter:
             return False
 
     def draw_plots(self, file_path):
+        """
+        Draws a variety of plots from JSON data retrieved from a specified URL.
+
+        Args:
+        file_path (str): The URL pointing to the JSON file to be plotted.
+
+        Returns:
+        list: A list of file paths to the created plots.
+        """
         if not self.__check_url(file_path):
             print("URL is not accessible")
             return []
@@ -110,15 +125,15 @@ class Plotter:
 
     def draw_combined_boxplots(self, data, columns_1, columns_2, title):
         plt.figure()
-        floor_data = pd.melt(data[columns_1], var_name='Metric', value_name='Value')
-        floor_data['Type'] = 'Floor'
-        ceiling_data = pd.melt(data[columns_2], var_name='Metric', value_name='Value')
-        ceiling_data['Type'] = 'Ceiling'
+        floor_data = pd.melt(data[columns_1], var_name='metric', value_name='value')
+        floor_data['type'] = 'Floor'
+        ceiling_data = pd.melt(data[columns_2], var_name='metric', value_name='value')
+        ceiling_data['type'] = 'Ceiling'
 
         combined_data = pd.concat([floor_data, ceiling_data])
         combined_data['Metric'] = combined_data['Metric'].str.replace('floor_', '').str.replace('ceiling_', '')
 
-        sns.boxplot(x='Metric', y='Value', hue='Type', data=combined_data)
+        sns.boxplot(x='metric', y='value', hue='type', data=combined_data)
         title = f'Boxplots for {title}'
         self.__plot_setup(title, '', 'Degrees')
         path = self.__save_plot_to_file(title)
